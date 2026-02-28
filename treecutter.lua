@@ -56,7 +56,7 @@ local checkBlock, cutAdjacent
 function checkBlock()
     local found, block = turtle.inspect()
     print("found block: " .. tostring(found) .. " - blockname: ".. tostring(found and block.name))
-    if found and string.find(block.name, "wood") then
+    if found and string.find(block.name, "log") then
         turtleController:tryMove("f")
         cutAdjacent()
     end
