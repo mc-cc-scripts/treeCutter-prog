@@ -38,6 +38,11 @@ local defaults = {
         ["description"] = "Sapling name",
         ["default"] = "minecraft:oak_sapling",
         ["type"] = "string",
+    },
+    ["pause"] = {
+        ["description"] = "Pause / sleep between check-loops in seconds",
+        ["default"] = 60,
+        ["type"] = "number",
     }
 }
 
@@ -55,10 +60,10 @@ local checkBlock, cutAdjacent
 
 function checkBlock()
     local found, block = turtle.inspect()
-    print("found block: " .. tostring(found) .. " - blockname: ".. tostring(found and block.name))
     if found and string.find(block.name, "log") then
         turtleController:tryMove("f")
         cutAdjacent()
+        turtleController:tryMove("b")
     end
 end
 
@@ -139,7 +144,7 @@ while true do
         for i = 1, Config:get("treesPerRow"), 1 do
             cutTree()
             ---@type string
-            local moveString = moveDir[oddEven[1]] .. ",f" .. tostring(Config:get("treeGap")) .. "," .. moveDir[oddEven[2]]
+            local moveString = moveDir[oddEven[1]] .. ",f" .. tostring(Config:get("treeGap") + 1) .. "," .. moveDir[oddEven[2]]
             
             turtleController:compactMove(moveString)
         end
@@ -148,5 +153,5 @@ while true do
         .. ",f," .. moveDir[oddEven[2]]
         turtleController:compactMove(mString)
     end
-    sleep(10)
+    sleep(Config:get("pause"))
 end
