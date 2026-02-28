@@ -105,7 +105,7 @@ end
 ---@comment Checks if tree exists, sheers it, 
 --- cuts it, places sapling, moves back to start pos
 local function cutTree()
-    local inspectedBlock = turtle.insect()
+    local inspectedBlock = turtle.inspect()
     -- assuming the block is wood then continue
     if (not inspectedBlock or (inspectedBlock.name == Config:get("saplingName"))) then
         return nil
