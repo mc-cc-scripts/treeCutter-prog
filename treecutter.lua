@@ -51,26 +51,56 @@ end
 
 turtleController.canBreakBlocks = true
 
+local checkBlock, cutAdjacent
 
-local moveDir = (Config:get("moveDir") == "right") and {"tR", "tL"} or {"tL", "tR"}
-while true do
-    
-    for j = 1, Config:get("row"), 1 do
-        local oddEven =j % 2 == 1 and {1,2} or {2,1}
-        for i = 1, Config:get("treesPerRow"), 1 do
-            cutTree()
-            ---@type string1
-            local moveString = moveDir[oddEven[1]] .. ",f" .. tostring(Config:get("treeGap")) .. "," .. moveDir[oddEven[2]]
-            
-            turtleController:compactMove(moveString)
-        end
-        local mString = moveDir[oddEven[2]] .. ",f," .. moveDir[oddEven[1]] 
-        .. ",f" .. tostring(Config:get("treeGap"))",".. moveDir[oddEven[1]] 
-        .. ",f," .. moveDir[oddEven[2]]
+function checkBlock()
+    local block = turtle.inspect()
+    if string.find(block.name, "wood") then
+        turtleController:tryMove("f")
+        cutAdjacent()
     end
-    sleep(10)
 end
 
+---@comment cuts a 3x3 area
+--- checks 5x5 area
+function cutAdjacent()
+    
+    local function step (check)
+        checkBlock()
+        turtleController:tryMove("f")
+        if(check) then
+            checkBlock()
+            turtleController:tryMove("tR")
+            checkBlock()
+            turtleController:tryMove("tL")
+        end
+    end
+
+    local function line ()
+        step(true)
+        step(true)
+        turtleController:tryMove("tL")
+    end
+
+    step(false)
+    checkBlock()
+    turtleController:tryMove("tL")
+    step(true)
+    checkBlock()
+    turtleController:tryMove("tL")
+    line()
+    line()
+    line()
+    turtleController:compactMove("f,tL,f,tA")
+    --- Legend: o => unchecked, c => checked, x => mined, s => startPos
+    --- o c c c o
+    --- c x x x c
+    --- c x s x c
+    --- c x x x c
+    --- o c c c o
+    
+
+end
 
 ---@comment Checks if tree exists, sheers it, 
 --- cuts it, places sapling, moves back to start pos
@@ -99,51 +129,23 @@ local function cutTree()
     
 end
 
----@comment cuts a 3x3 area
---- checks 5x5 area
-local function cutAdjacent()
+
+local moveDir = (Config:get("moveDir") == "right") and {"tR", "tL"} or {"tL", "tR"}
+while true do
     
-    local function step (check)
-        t()
-        turtleController:tryMove("f")
-        if(check) then
-            t()
-            turtleController:tryMove("tR")
-            t()
-            turtleController:tryMove("tL")
+    for j = 1, Config:get("rows"), 1 do
+        local oddEven =j % 2 == 1 and {1,2} or {2,1}
+        for i = 1, Config:get("treesPerRow"), 1 do
+            cutTree()
+            ---@type string
+            local moveString = moveDir[oddEven[1]] .. ",f" .. tostring(Config:get("treeGap")) .. "," .. moveDir[oddEven[2]]
+            
+            turtleController:compactMove(moveString)
         end
+        local mString = moveDir[oddEven[2]] .. ",f," .. moveDir[oddEven[1]] 
+        .. ",f" .. tostring(Config:get("treeGap"))",".. moveDir[oddEven[1]] 
+        .. ",f," .. moveDir[oddEven[2]]
+        turtleController:compactMove(mString)
     end
-
-    local function line ()
-        step(true)
-        step(true)
-        turtleController:tryMove("tL")
-    end
-
-    step(false)
-    t()
-    turtleController:tryMove("tL")
-    step(true)
-    t()
-    turtleController:tryMove("tL")
-    line()
-    line()
-    line()
-    turtleController:compactMove("f,tL,f,tA")
-    --- Legend: o => unchecked, c => checked, x => mined, s => startPos
-    --- o c c c o
-    --- c x x x c
-    --- c x s x c
-    --- c x x x c
-    --- o c c c o
-    
-
-end
-
-function t()
-    local block = turtle.inspect()
-    if string.find(block.name, "wood") then
-        turtleController:tryMove("f")
-        cutAdjacent()
-    end
+    sleep(10)
 end
