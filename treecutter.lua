@@ -54,8 +54,9 @@ turtleController.canBreakBlocks = true
 local checkBlock, cutAdjacent
 
 function checkBlock()
-    local block = turtle.inspect()
-    if string.find(block.name, "wood") then
+    local found, block = turtle.inspect()
+    print("found block: " .. tostring(found) .. " - blockname: ".. tostring(found and block.name))
+    if found and string.find(block.name, "wood") then
         turtleController:tryMove("f")
         cutAdjacent()
     end
@@ -105,9 +106,9 @@ end
 ---@comment Checks if tree exists, sheers it, 
 --- cuts it, places sapling, moves back to start pos
 local function cutTree()
-    local inspectedBlock = turtle.inspect()
+    local blockFound, inspectedBlock = turtle.inspect()
     -- assuming the block is wood then continue
-    if (not inspectedBlock or (inspectedBlock.name == Config:get("saplingName"))) then
+    if (not blockFound or (inspectedBlock.name == Config:get("saplingName"))) then
         return nil
     end
 
@@ -143,7 +144,7 @@ while true do
             turtleController:compactMove(moveString)
         end
         local mString = moveDir[oddEven[2]] .. ",f," .. moveDir[oddEven[1]] 
-        .. ",f" .. tostring(Config:get("treeGap"))",".. moveDir[oddEven[1]] 
+        .. ",f" .. tostring(Config:get("treeGap") + 1)",".. moveDir[oddEven[1]] 
         .. ",f," .. moveDir[oddEven[2]]
         turtleController:compactMove(mString)
     end
