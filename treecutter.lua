@@ -16,17 +16,17 @@ local turtleController = scm:load("turtleController")
 local defaults = {
     ["treeGap"] = {
         ["description"] = "Gap between trees",
-        ["default"] = 4,
+        ["default"] = 1,
         ["type"] = "number"
     },
     ["treesPerRow"] = {
         ["description"] = "Amount of trees per row",
-        ["default"] = 8,
+        ["default"] = 5,
         ["type"] = "number"
     },
     ["rows"] = {
         ["description"] = "Amount of rows",
-        ["default"] = 2,
+        ["default"] = 1,
         ["type"] = "number",
     },
     ["moveDir"] = {
@@ -137,21 +137,17 @@ end
 
 
 local moveDir = (Config:get("moveDir") == "right") and {"tR", "tL"} or {"tL", "tR"}
+local j = 1
 while true do
-    
-    for j = 1, Config:get("rows"), 1 do
         local oddEven =j % 2 == 1 and {1,2} or {2,1}
-        for i = 1, Config:get("treesPerRow"), 1 do
-            cutTree()
+        j = j == 1 and 2 or 1
+        cutTree()
+        for i = 1, Config:get("treesPerRow") - 1, 1 do
             ---@type string
             local moveString = moveDir[oddEven[1]] .. ",f" .. tostring(Config:get("treeGap") + 1) .. "," .. moveDir[oddEven[2]]
             
             turtleController:compactMove(moveString)
+            cutTree()
         end
-        local mString = moveDir[oddEven[2]] .. ",f," .. moveDir[oddEven[1]] 
-        .. ",f" .. tostring(Config:get("treeGap") + 1)",".. moveDir[oddEven[1]] 
-        .. ",f," .. moveDir[oddEven[2]]
-        turtleController:compactMove(mString)
-    end
     sleep(Config:get("pause"))
 end
